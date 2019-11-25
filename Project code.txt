@@ -1,0 +1,104 @@
+1.1	SELECT CustomerID, CompanyName, City, Address, Region, PostalCode, Country
+FROM Customers
+WHERE City = 'Paris' or City = 'London';
+
+1.2	SELECT *
+FROM products
+WHERE QuantityPerUnit LIKE '%bottles';
+
+1.3	SELECT Products.*, Suppliers.CompanyName, Suppliers.Country
+FROM Products LEFT JOIN Suppliers ON Products.SupplierID=Suppliers.SupplierID WHERE QuantityPerUnit LIKE '%bottles';
+
+1.4	SELECT count(Categories.CategoryID) 'Count', Categories.CategoryName
+FROM Categories LEFT JOIN Products ON Categories.CategoryID=Products.CategoryID GROUP BY CategoryName
+ORDER BY Count DESC;
+
+1.5	SELECT FirstName + ' ' + LastName 'Name', City
+FROM Employees
+WHERE Country = 'UK';
+
+1.6
+SELECT R.RegionDescription
+,CAST(SUM(ROUND((OD.UnitPrice * OD.Quantity)-(OD.UnitPrice * OD.Quantity * OD.Discount) + O.Freight, 2)) AS MONEY) AS Total_Sales
+FROM Territories T
+JOIN Region R
+	ON T.RegionID = R.RegionID
+JOIN EmployeeTerritories ET
+	ON T.TerritoryID = ET.TerritoryID
+JOIN Orders O
+	ON ET.EmployeeID = O.EmployeeID
+JOIN [Order Details] OD
+	ON O.OrderID = OD.OrderID
+GROUP BY R.RegionDescription
+HAVING CAST(SUM(ROUND((OD.UnitPrice * OD.Quantity)-(OD.UnitPrice * OD.Quantity * OD.Discount) + O.Freight, 2)) AS MONEY) > 1000000;
+
+1.7	SELECT COUNT(OrderID) 'Order Count'
+FROM Orders
+WHERE Freight > 100.00 AND (ShipCountry = 'USA' or ShipCountry = 'UK');
+
+1.8	SELECT TOP 1 OrderID, ROUND(SUM(UnitPrice*Quantity), 2) 'PriceTotal', ROUND(SUM((UnitPrice*Quantity)*Discount), 2) 'Reduction'
+FROM [Order Details]
+GROUP BY OrderID
+ORDER BY Reduction DESC;
+
+
+
+
+2.1 	USE Team;
+CREATE TABLE Spartans_Table
+(
+SpartanID INT PRIMARY KEY,
+Title VARCHAR(4),
+FirstName VARCHAR(20),
+LastName VARCHAR(30),
+University VARCHAR(100),
+Course VARCHAR(50),
+Grade VARCHAR(4)
+);
+
+2.2	 USE Team;
+INSERT INTO Spartans_Table
+(
+SpartanID, Title, FirstName, LastName, University, Course, Grade
+)
+VALUES
+(12,'Mr','Shaqil','Abdullah','Brunel','Mechanical Engineering','2:1'),
+(22,'Mr','Zaid','Iqbal','Queen Mary','Computer Science','2:1'),
+(32,'Mr','Joyel','Shaju','Coventry','Computer Science','1st'),
+(42,'Mr','Victor','Granados Jimenez','Granada','Information and Documentation','2:1'),
+(52,'Mr','Jack','Farmer','Leeds','Physics','2:1'),
+(62,'Mr','Mohammad','Khwaja','Westminster','Electronic Engineer','2:2'),
+(72,'Mr','Thomas','Briggs','Bournemouth','Exercise Science','1st'),
+(82,'Mr','Daniel','Lippross','Hull','Chemistry','2:2'),
+(92,'Mr','Paul','Brewer','Hull','Computer Science','1st'),
+(102,'Miss','Elizabeth','Nicholl','Cantebury Christ Church University','Sport and Exercise','1st'),
+(112,'Miss','Ariadna','Gonzalez Lopez','London Metropolitan','Business Information Technology','1st'),
+(122,'LORD','Ygor','Teixeira','University of Greenwhich','Games Design and Development','2:2'),
+(132,'Mr','Anjum Ali','Saiyad','Queen Mary','Mathematics','2:2'),
+(142,'Mr','Hussain','Fiaz','University of East London','Computer Science','2:2'),
+(152,'Mr','Javier','Martinez Romero','Royal Holloway','Mathematics','3rd');
+
+
+
+
+3.1 	SELECT a.FirstName + ' ' + a.LastName 'Full Name', b.FirstName + ' ' + b.LastName 'Reports To'
+FROM Employees a
+LEFT JOIN Employees b ON a.ReportsTo=b.EmployeeID;
+
+3.2	 SELECT s.CompanyName 'Company', ROUND(SUM(od.UnitPrice * (1 - Discount) * Quantity), 2) 'Total Sales'
+FROM [Order Details] od
+JOIN Products p ON od.ProductID=p.ProductID
+JOIN Suppliers s ON p.SupplierID=s.SupplierID
+GROUP BY s.CompanyName
+HAVING SUM(od.UnitPrice * (1 - Discount) * Quantity) > 10000;
+
+3.3 	SELECT TOP 10 CustomerID 'Customer', ROUND(SUM(UnitPrice * Quantity * (1-Discount)), 2) 'Total Sales'
+FROM Orders o
+JOIN [Order Details] od ON o.OrderID = od.OrderID
+GROUP BY CustomerID, OrderDate
+HAVING YEAR(OrderDate) = 1998
+ORDER BY 'Total Sales' DESC;
+
+3.4	 SELECT CONCAT(MONTH(OrderDate), '-', YEAR(OrderDate)) 'Order date', AVG(DATEDIFF(DAY, OrderDate, ShippedDate)) 'Avg shipping time'
+FROM Orders
+GROUP BY CONCAT(MONTH(OrderDate), '-', YEAR(OrderDate)); 
